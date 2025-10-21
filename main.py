@@ -18,8 +18,8 @@ import os
 # Adiciona o diretório src ao path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from parser import TermIAParser
-from ast_nodes import (
+from src.parser import TermIAParser
+from src.ast_nodes import (
     LSCommand, CDCommand, MkdirCommand, PwdCommand, CatCommand,
     IAAskCommand, IASummarizeCommand, IACodeExplainCommand, IATranslateCommand,
     HistoryCommand, ClearCommand, HelpCommand, ExitCommand

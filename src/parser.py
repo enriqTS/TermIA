@@ -206,7 +206,7 @@ class TermIAParser:
                 | DOT
                 | DOTDOT
                 | TILDE"""
-        p[0] = p[1]
+        p[0] = str(p[1])
     
     def p_command_name(self, p):
         """command_name : LS
