@@ -77,15 +77,15 @@ class TermIA:
         banner = f"""
 {Fore.CYAN}{Style.BRIGHT}╔═══════════════════════════════════════════════════════╗
 ║                                                       ║
-║   {Fore.MAGENTA}████████╗███████╗██████╗ ███╗   ███╗██╗ █████╗ {Fore.CYAN}  ║
-║   {Fore.MAGENTA}╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║██╔══██╗{Fore.CYAN}  ║
-║   {Fore.MAGENTA}   ██║   █████╗  ██████╔╝██╔████╔██║██║███████║{Fore.CYAN}  ║
-║   {Fore.MAGENTA}   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██╔══██║{Fore.CYAN}  ║
-║   {Fore.MAGENTA}   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║  ██║{Fore.CYAN}  ║
-║   {Fore.MAGENTA}   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═╝{Fore.CYAN}  ║
+║   {Fore.MAGENTA}████████╗███████╗██████╗ ███╗   ███╗██╗ █████╗ {Fore.CYAN}     ║
+║   {Fore.MAGENTA}╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║██╔══██╗{Fore.CYAN}     ║
+║   {Fore.MAGENTA}   ██║   █████╗  ██████╔╝██╔████╔██║██║███████║{Fore.CYAN}     ║
+║   {Fore.MAGENTA}   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██╔══██║{Fore.CYAN}     ║
+║   {Fore.MAGENTA}   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║  ██║{Fore.CYAN}     ║
+║   {Fore.MAGENTA}   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═╝{Fore.CYAN}     ║
 ║                                                       ║
-║         {Fore.YELLOW}Terminal Inteligente - Versão 2.0{Fore.CYAN}          ║
-║         {Fore.GREEN}Projeto de Compiladores - UNIFEI{Fore.CYAN}           ║
+║         {Fore.YELLOW}Terminal Inteligente - Versão 2.0{Fore.CYAN}             ║
+║         {Fore.GREEN}Projeto de Compiladores - UNIFEI{Fore.CYAN}              ║
 ║                                                       ║
 ╚═══════════════════════════════════════════════════════╝{Style.RESET_ALL}
 
