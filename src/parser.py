@@ -227,11 +227,20 @@ class TermIAParser:
     def p_error(self, p):
         """Tratamento de erro sintático."""
         if p:
-            print(f"Erro de sintaxe no token '{p.value}' (tipo: {p.type}) na posição {p.lexpos}")
+            # Mensagens específicas para erros comuns
+            if p.type == 'MKDIR':
+                print(f"Erro de sintaxe: comando 'mkdir' requer um caminho")
+                print(f"  Uso: mkdir <diretório>  ou  mkdir -p <diretório>")
+            elif p.type == 'CAT':
+                print(f"Erro de sintaxe: comando 'cat' requer um arquivo")
+                print(f"  Uso: cat <arquivo>")
+            else:
+                print(f"Erro de sintaxe no token '{p.value}' (tipo: {p.type}) na posição {p.lexpos}")
             # Tenta recuperar do erro descartando o token
             self.parser.errok()
         else:
-            print("Erro de sintaxe: fim de entrada inesperado")
+            print("Erro de sintaxe: comando incompleto")
+            print("  Digite 'help' para ver os comandos disponíveis")
     
     # ==================== Métodos Públicos ====================
     

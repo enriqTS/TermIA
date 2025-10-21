@@ -1,3 +1,13 @@
+"""
+TermIA - Analisador Léxico
+Este módulo implementa o lexer usando PLY (Python Lex-Yacc)
+para tokenizar comandos do TermIA.
+
+Autor: [Seu Nome]
+Data: Outubro 2024
+Disciplina: ECOI26 - Compiladores
+"""
+
 import ply.lex as lex
 from typing import Optional
 
@@ -37,8 +47,8 @@ class TermIALexer:
         # Literais
         'STRING',            # "texto entre aspas"
         'NUMBER',            # 123
-        'IDENTIFIER',        # nome_arquivo, variavel
         'PATH',              # /home/user, ./file, ../dir
+        'IDENTIFIER',        # nome_arquivo, variavel
         
         # Símbolos especiais
         'DOT',               # .
@@ -88,7 +98,7 @@ class TermIALexer:
         self.lexer = lex.lex(module=self, **kwargs)
 
     def t_LONG_OPTION(self, t):
-        r'--[a-zA-Z][a-zA-Z0-9_-]*'
+        r'--[a-zA-Z][a-zA-Z0-9_-]+'
         # Remove os dois hífens do início
         t.value = t.value[2:]
         return t
@@ -125,20 +135,15 @@ class TermIALexer:
         r'~'
         return t
 
+    # PATH deve vir antes de IDENTIFIER
     def t_PATH(self, t):
-        r'(\.{1,2}/|/|~/)?([a-zA-Z0-9_.-]+/)*[a-zA-Z0-9_.-]*'
-        # Verifica se é uma palavra reservada
-        if t.value in self.reserved:
-            t.type = self.reserved[t.value]
-        else:
-            # Mantém como PATH se contiver / ou começar com . ou ~
-            if '/' in t.value or t.value.startswith('.') or t.value.startswith('~'):
-                t.type = 'PATH'
-            # Caso contrário, pode ser um identificador ou palavra reservada
-            elif t.value in self.reserved:
-                t.type = self.reserved[t.value]
-            else:
-                t.type = 'IDENTIFIER'
+        r'(/[a-zA-Z0-9_./~-]+|~/[a-zA-Z0-9_./~-]+|\./[a-zA-Z0-9_./~-]+|\.\./[a-zA-Z0-9_./~-]+|[a-zA-Z0-9_-]+/[a-zA-Z0-9_./~-]*)'
+        # Reconhece:
+        # /path - absoluto
+        # ~/path - home
+        # ./path - relativo atual
+        # ../path - relativo pai
+        # dir/path - relativo com dir
         return t
 
     def t_IDENTIFIER(self, t):

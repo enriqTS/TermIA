@@ -15,15 +15,30 @@ Professor: Walter Aoiama Nagai
 import sys
 import os
 
-# Adiciona o diretório src ao path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+# Garante que o diretório src está no path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+src_dir = os.path.join(current_dir, 'src')
+if src_dir not in sys.path:
+    sys.path.insert(0, src_dir)
 
-from src.parser import TermIAParser
-from src.ast_nodes import (
-    LSCommand, CDCommand, MkdirCommand, PwdCommand, CatCommand,
-    IAAskCommand, IASummarizeCommand, IACodeExplainCommand, IATranslateCommand,
-    HistoryCommand, ClearCommand, HelpCommand, ExitCommand
-)
+# Imports do projeto
+from parser import TermIAParser
+import ast_nodes
+
+# Importa as classes AST explicitamente
+LSCommand = ast_nodes.LSCommand
+CDCommand = ast_nodes.CDCommand
+MkdirCommand = ast_nodes.MkdirCommand
+PwdCommand = ast_nodes.PwdCommand
+CatCommand = ast_nodes.CatCommand
+IAAskCommand = ast_nodes.IAAskCommand
+IASummarizeCommand = ast_nodes.IASummarizeCommand
+IACodeExplainCommand = ast_nodes.IACodeExplainCommand
+IATranslateCommand = ast_nodes.IATranslateCommand
+HistoryCommand = ast_nodes.HistoryCommand
+ClearCommand = ast_nodes.ClearCommand
+HelpCommand = ast_nodes.HelpCommand
+ExitCommand = ast_nodes.ExitCommand
 
 try:
     from colorama import init, Fore, Style
@@ -109,7 +124,8 @@ class TermIA:
             ast = self.parser.parse(command, debug=self.debug_mode)
             
             if ast is None:
-                print(f"{Fore.RED}Erro: comando não reconhecido ou sintaxe inválida{Style.RESET_ALL}")
+                # Parser já imprimiu mensagem de erro específica
+                # Não precisamos imprimir nada adicional
                 return
             
             # Exibe AST em modo debug
@@ -137,39 +153,44 @@ class TermIA:
         Args:
             ast: Nó da AST a ser executado
         """
+        # Pega o nome da classe para comparação
+        class_name = type(ast).__name__
+        
         # Comandos de controle (implementados)
-        if isinstance(ast, ExitCommand):
+        if class_name == 'ExitCommand':
             print(f"{Fore.YELLOW}Encerrando TermIA... Até logo!{Style.RESET_ALL}")
             self.running = False
             return
         
-        if isinstance(ast, ClearCommand):
+        elif class_name == 'ClearCommand':
             os.system('clear' if os.name != 'nt' else 'cls')
             return
         
-        if isinstance(ast, HistoryCommand):
+        elif class_name == 'HistoryCommand':
             self.show_history_ast(ast)
             return
         
-        if isinstance(ast, HelpCommand):
+        elif class_name == 'HelpCommand':
             self.show_help_ast(ast)
             return
         
-        # Outros comandos (ainda não implementados)
-        if isinstance(ast, (LSCommand, CDCommand, MkdirCommand, PwdCommand, CatCommand)):
+        # Comandos de SO (ainda não implementados)
+        elif class_name in ['LSCommand', 'CDCommand', 'MkdirCommand', 'PwdCommand', 'CatCommand']:
             print(f"{Fore.CYAN}[Parser OK] Comando reconhecido: {ast}{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}⚠ Executor de comandos SO ainda não implementado.{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}  Este comando será executado na próxima versão.{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}  Este comando será executado na próxima versão (Semana 4).{Style.RESET_ALL}\n")
             return
         
-        if isinstance(ast, (IAAskCommand, IASummarizeCommand, IACodeExplainCommand, IATranslateCommand)):
+        # Comandos de IA (ainda não implementados)
+        elif class_name in ['IAAskCommand', 'IASummarizeCommand', 'IACodeExplainCommand', 'IATranslateCommand']:
             print(f"{Fore.CYAN}[Parser OK] Comando IA reconhecido: {ast}{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}⚠ Integração com IA ainda não implementada.{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}  Este comando será executado nas próximas semanas.{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}  Este comando será executado na próxima versão (Semana 5).{Style.RESET_ALL}\n")
             return
         
-        # Comando não implementado
-        print(f"{Fore.RED}Comando não implementado ainda: {type(ast).__name__}{Style.RESET_ALL}")
+        # Comando desconhecido
+        else:
+            print(f"{Fore.RED}Erro: tipo de comando desconhecido: {class_name}{Style.RESET_ALL}")
     
     def show_history_ast(self, ast: HistoryCommand):
         """Mostra o histórico usando o nó AST."""
