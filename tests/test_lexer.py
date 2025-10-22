@@ -1,9 +1,6 @@
 """
 Testes para o analisador léxico do TermIA.
 Este módulo testa todas as funcionalidades do lexer usando pytest.
-
-Autor: [Seu Nome]
-Data: Outubro 2024
 """
 
 import pytest

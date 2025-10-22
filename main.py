@@ -5,11 +5,6 @@ Arquivo principal para executar o terminal.
 
 Versão 2.0 - com Lexer e Parser integrados.
 Executor será implementado na próxima semana.
-
-Autor: [Seu Nome]
-Data: Outubro 2024
-Disciplina: ECOI26 - Compiladores
-Professor: Walter Aoiama Nagai
 """
 
 import sys

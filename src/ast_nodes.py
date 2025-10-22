@@ -1,10 +1,6 @@
 """
 TermIA - Definição dos Nós da AST (Abstract Syntax Tree)
 Este módulo define as classes que representam os nós da árvore sintática abstrata.
-
-Autor: [Seu Nome]
-Data: Outubro 2024
-Disciplina: ECOI26 - Compiladores
 """
 
 from abc import ABC, abstractmethod

@@ -2,10 +2,6 @@
 TermIA - Analisador Léxico
 Este módulo implementa o lexer usando PLY (Python Lex-Yacc)
 para tokenizar comandos do TermIA.
-
-Autor: [Seu Nome]
-Data: Outubro 2024
-Disciplina: ECOI26 - Compiladores
 """
 
 import ply.lex as lex
