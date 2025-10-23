@@ -309,6 +309,8 @@ def main():
         'ls',
         'ls -la',
         'ls /home/user',
+        'ls ./home/user',
+        'ls ..',
         'ls -lah /var/log',
         'cd ..',
         'cd /home',

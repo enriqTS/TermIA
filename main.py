@@ -68,25 +68,26 @@ class TermIA:
         self.debug_mode = debug_mode
     
     def print_banner(self):
-        """Imprime o banner de bienvenida."""
+        """Imprime a logo bonita do shell."""
         banner = f"""
-{Fore.CYAN}{Style.BRIGHT}╔═══════════════════════════════════════════════════════╗
-║                                                       ║
-║   {Fore.MAGENTA}████████╗███████╗██████╗ ███╗   ███╗██╗ █████╗ {Fore.CYAN}     ║
-║   {Fore.MAGENTA}╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║██╔══██╗{Fore.CYAN}     ║
-║   {Fore.MAGENTA}   ██║   █████╗  ██████╔╝██╔████╔██║██║███████║{Fore.CYAN}     ║
-║   {Fore.MAGENTA}   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██╔══██║{Fore.CYAN}     ║
-║   {Fore.MAGENTA}   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║  ██║{Fore.CYAN}     ║
-║   {Fore.MAGENTA}   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═╝{Fore.CYAN}     ║
-║                                                       ║
-║         {Fore.YELLOW}Terminal Inteligente - Versão 2.0{Fore.CYAN}             ║
-║         {Fore.GREEN}Projeto de Compiladores - UNIFEI{Fore.CYAN}              ║
-║                                                       ║
-╚═══════════════════════════════════════════════════════╝{Style.RESET_ALL}
+            {Fore.CYAN}{Style.BRIGHT}╔═══════════════════════════════════════════════════════╗
+            ║                                                       ║
+            ║   {Fore.MAGENTA}████████╗███████╗██████╗ ███╗   ███╗██╗ █████╗ {Fore.CYAN}     ║
+            ║   {Fore.MAGENTA}╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║██╔══██╗{Fore.CYAN}     ║
+            ║   {Fore.MAGENTA}   ██║   █████╗  ██████╔╝██╔████╔██║██║███████║{Fore.CYAN}     ║
+            ║   {Fore.MAGENTA}   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██╔══██║{Fore.CYAN}     ║
+            ║   {Fore.MAGENTA}   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║  ██║{Fore.CYAN}     ║
+            ║   {Fore.MAGENTA}   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═╝{Fore.CYAN}     ║
+            ║                                                       ║
+            ║         {Fore.YELLOW}Terminal Inteligente - Versão 2.0{Fore.CYAN}             ║
+            ║         {Fore.GREEN}Projeto de Compiladores - UNIFEI{Fore.CYAN}              ║
+            ║            {Fore.GREEN}Autores: Argéu e Henrique{Fore.CYAN}                  ║
+            ║                                                       ║
+            ╚═══════════════════════════════════════════════════════╝{Style.RESET_ALL}
 
-{Fore.YELLOW}Digite 'help' para ajuda ou 'exit' para sair{Style.RESET_ALL}
-{Fore.GREEN}Status: Lexer ✓ | Parser ✓ | Executor: em desenvolvimento{Style.RESET_ALL}
-"""
+            {Fore.YELLOW}Digite 'help' para ajuda ou 'exit' para sair{Style.RESET_ALL}
+            {Fore.GREEN}Status: Lexer ✓ | Parser ✓ | Executor: em desenvolvimento{Style.RESET_ALL}
+            """
         print(banner)
     
     def get_prompt(self):
@@ -119,8 +120,7 @@ class TermIA:
             ast = self.parser.parse(command, debug=self.debug_mode)
             
             if ast is None:
-                # Parser já imprimiu mensagem de erro específica
-                # Não precisamos imprimir nada adicional
+                # O parser ja imprime o erro
                 return
             
             # Exibe AST em modo debug
@@ -151,7 +151,7 @@ class TermIA:
         # Pega o nome da classe para comparação
         class_name = type(ast).__name__
         
-        # Comandos de controle (implementados)
+        # Comandos de controle já implementados 
         if class_name == 'ExitCommand':
             print(f"{Fore.YELLOW}Encerrando TermIA... Até logo!{Style.RESET_ALL}")
             self.running = False
@@ -172,15 +172,15 @@ class TermIA:
         # Comandos de SO (ainda não implementados)
         elif class_name in ['LSCommand', 'CDCommand', 'MkdirCommand', 'PwdCommand', 'CatCommand']:
             print(f"{Fore.CYAN}[Parser OK] Comando reconhecido: {ast}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}⚠ Executor de comandos SO ainda não implementado.{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}  Este comando será executado na próxima versão (Semana 4).{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}⚠  Executor de comandos SO ainda não implementado.{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW} Este comando será executado na próxima versão (Semana 4).{Style.RESET_ALL}\n")
             return
         
         # Comandos de IA (ainda não implementados)
         elif class_name in ['IAAskCommand', 'IASummarizeCommand', 'IACodeExplainCommand', 'IATranslateCommand']:
             print(f"{Fore.CYAN}[Parser OK] Comando IA reconhecido: {ast}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}⚠ Integração com IA ainda não implementada.{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}  Este comando será executado na próxima versão (Semana 5).{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}⚠  Integração com IA ainda não implementada.{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW} Este comando será executado na próxima versão (Semana 5).{Style.RESET_ALL}\n")
             return
         
         # Comando desconhecido
@@ -264,7 +264,6 @@ class TermIA:
                 # Ctrl+C
                 print(f"\n{Fore.YELLOW}Use 'exit' para sair{Style.RESET_ALL}")
             except EOFError:
-                # Ctrl+D
                 print(f"\n{Fore.YELLOW}Encerrando...{Style.RESET_ALL}")
                 break
             except Exception as e:
@@ -299,7 +298,8 @@ Opções:
     
     if '--version' in sys.argv or '-v' in sys.argv:
         print("TermIA v2.0 - Terminal Inteligente")
-        print("Projeto de Compiladores - UNIFEI 2024")
+        print("Autores: Argéu e Henrique")
+        print("Projeto de Compiladores - UNIFEI 2025")
         sys.exit(0)
     
     # Cria e executa o terminal
