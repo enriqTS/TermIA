@@ -133,13 +133,17 @@ class TermIALexer:
 
     # PATH deve vir antes de IDENTIFIER
     def t_PATH(self, t):
-        r'(/[a-zA-Z0-9_./~-]+|~/[a-zA-Z0-9_./~-]+|\./[a-zA-Z0-9_./~-]+|\.\./[a-zA-Z0-9_./~-]+|[a-zA-Z0-9_-]+/[a-zA-Z0-9_./~-]*)'
+        r'(?:~|\.{1,2}|/)(?:[A-Za-z0-9._~-]+(?:/[A-Za-z0-9._~-]+)*)?'
+
+        # r'(/[a-zA-Z0-9_./~-]+|~/[a-zA-Z0-9_./~-]+|\./[a-zA-Z0-9_./~-]+|\.\./[a-zA-Z0-9_./~-]+|[a-zA-Z0-9_-]+/[a-zA-Z0-9_./~-]*)' <- modelo antigo
+        
         # Reconhece:
         # /path - absoluto
         # ~/path - home
         # ./path - relativo atual
         # ../path - relativo pai
         # dir/path - relativo com dir
+        # ./ e ../ tbm
         return t
 
     def t_IDENTIFIER(self, t):
@@ -232,6 +236,11 @@ def main():
         'clear',
         'help ls',
         'exit',
+        'cd ~/',
+        'cd ./',
+        'cd ../',
+        'cd ./abc',
+        'cd ../abc',
     ]
     
     print("=" * 60)
