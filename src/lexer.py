@@ -118,24 +118,9 @@ class TermIALexer:
         r'\d+'
         t.value = int(t.value)
         return t
-
-    def t_DOTDOT(self, t):
-        r'\.\.'
-        return t
-
-    def t_DOT(self, t):
-        r'\.'
-        return t
-
-    def t_TILDE(self, t):
-        r'~'
-        return t
-
-    # PATH deve vir antes de IDENTIFIER
+    
     def t_PATH(self, t):
-        r'(?:~|\.{1,2}|/)(?:[A-Za-z0-9._~-]+(?:/[A-Za-z0-9._~-]+)*)?'
-
-        # r'(/[a-zA-Z0-9_./~-]+|~/[a-zA-Z0-9_./~-]+|\./[a-zA-Z0-9_./~-]+|\.\./[a-zA-Z0-9_./~-]+|[a-zA-Z0-9_-]+/[a-zA-Z0-9_./~-]*)' <- modelo antigo
+        r'(/[a-zA-Z0-9_./~-]+|~/[a-zA-Z0-9_./~-]*|\./[a-zA-Z0-9_./~-]*|\.\./[a-zA-Z0-9_./~-]*|[a-zA-Z0-9_-]+/[a-zA-Z0-9_./~-]*)'
         
         # Reconhece:
         # /path - absoluto
@@ -145,6 +130,19 @@ class TermIALexer:
         # dir/path - relativo com dir
         # ./ e ../ tbm
         return t
+
+    def t_DOTDOT(self, t):
+        r'\.\.(?!/)'
+        return t
+
+    def t_DOT(self, t):
+        r'\.(?!/)'
+        return t
+
+    def t_TILDE(self, t):
+        r'~(?!/)'
+        return t
+
 
     def t_IDENTIFIER(self, t):
         r'[a-zA-Z_][a-zA-Z0-9_.-]*'
@@ -241,6 +239,8 @@ def main():
         'cd ../',
         'cd ./abc',
         'cd ../abc',
+        'cd ~/abc',
+        'mkdir -p projects/2024',
     ]
     
     print("=" * 60)
