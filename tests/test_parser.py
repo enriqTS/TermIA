@@ -1,9 +1,6 @@
 """
 Testes para o analisador sintático do TermIA.
 Este módulo testa todas as funcionalidades do parser usando pytest.
-
-Autor: [Seu Nome]
-Data: Outubro 2024
 """
 
 import pytest

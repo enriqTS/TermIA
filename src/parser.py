@@ -2,10 +2,6 @@
 TermIA - Analisador Sintático
 Este módulo implementa o parser usando PLY (Python Lex-Yacc)
 para analisar a sintaxe dos comandos do TermIA.
-
-Autor: [Seu Nome]
-Data: Outubro 2024
-Disciplina: ECOI26 - Compiladores
 """
 
 import ply.yacc as yacc
