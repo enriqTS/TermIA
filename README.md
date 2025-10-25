@@ -4,7 +4,7 @@
 [![PLY](https://img.shields.io/badge/PLY-3.11-green.svg)](https://www.dabeaz.com/ply/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**TermIA** é um terminal inteligente desenvolvido como projeto final da disciplina de Compiladores (ECOI26) da Universidade Federal de Itajubá. O projeto integra conceitos de análise léxica, análise sintática e inteligência artificial para criar um shell personalizado e funcional.
+**TermIA** é um terminal inteligente desenvolvido como projeto final da disciplina de Compiladores (ECOI26) da Universidade Federal de Itajubá. O projeto integra conceitos de análise léxica, análise sintática e inteligência artificial para criar um shell personalizado.
 
 ## Índice
 
@@ -51,7 +51,7 @@
 
 1. **Clone o repositório:**
 ```bash
-git clone https://github.com/seu-usuario/termia.git
+git clone https://github.com/enriqTS/TermIA.git
 cd termia
 ```
 
@@ -65,16 +65,10 @@ venv\Scripts\activate  # No Windows
 
 3. **Instale as dependências:**
 ```bash
-pip install -r requirements.txt
+pip install ply
 ```
 
-4. **Configure as variáveis de ambiente:**
-```bash
-cp .env.example .env
-nano .env  # Edite com suas credenciais de API
-```
-
-5. **Execute o TermIA:**
+4. **Execute o TermIA:**
 ```bash
 python main.py
 ```
@@ -170,68 +164,6 @@ TermIA> exit
 └─────────────┘
 ```
 
-### Estrutura de Diretórios
-
-```
-termia/
-├── src/              # Código fonte
-│   ├── lexer.py     # Analisador léxico
-│   ├── parser.py    # Analisador sintático
-│   ├── executor.py  # Executor de comandos
-│   └── ...
-├── tests/            # Testes unitários
-├── docs/             # Documentação
-├── examples/         # Exemplos de uso
-└── main.py          # Ponto de entrada
-```
-
-## Desenvolvimento
-
-### Configurar Ambiente de Desenvolvimento
-
-```bash
-# Instalar dependências de desenvolvimento
-pip install -r requirements.txt
-
-# Instalar hooks de pre-commit (opcional)
-pre-commit install
-```
-
-### Executar Testes
-
-```bash
-# Todos os testes
-pytest tests/
-
-# Testes com cobertura
-pytest tests/ --cov=src --cov-report=html
-
-# Teste específico
-pytest tests/test_lexer.py -v
-```
-
-### Linting e Formatação
-
-```bash
-# Formatar código
-black src/ tests/
-
-# Verificar estilo
-flake8 src/ tests/
-
-# Type checking
-mypy src/
-```
-
-### Usando Makefile
-
-```bash
-make test      # Executar testes
-make lint      # Verificar código
-make format    # Formatar código
-make clean     # Limpar arquivos temporários
-```
-
 ## Testes
 
 ### Estrutura de Testes
@@ -258,16 +190,10 @@ pytest tests/ -vv
 pytest tests/ -x
 ```
 
-## Documentação Adicional
-
-- [Especificação de Comandos](docs/commands_spec.md)
-- [Gramática Formal](docs/grammar.md)
-- [Arquitetura do Sistema](docs/architecture.md)
-- [Guia de Integração IA](docs/api_integration.md)
-
 ## Autores
 
-- **[Seu Nome]** - *Desenvolvimento* - [@seu-usuario](https://github.com/seu-usuario)
+- **Henrique Teixeira Silva** - *Desenvolvimento* - [@enriqTS](https://github.com/enriqTS)
+- **Argéu Venturini Souza Rodrigues** - *Desenvolvimento* - [@Argeu42](https://github.com/Argeu42)
 
 ## Informações Acadêmicas
 
