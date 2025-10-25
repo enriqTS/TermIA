@@ -2,9 +2,6 @@
 """
 TermIA - Terminal Inteligente
 Arquivo principal para executar o terminal.
-
-Versão 2.0 - com Lexer e Parser integrados.
-Executor será implementado na próxima semana.
 """
 
 import sys
@@ -57,10 +54,10 @@ except ImportError:
 
 
 class TermIA:
-    """Classe principal do TermIA."""
+    "Classe principal do TermIA."
     
     def __init__(self, debug_mode=False):
-        """Inicializa o TermIA."""
+        "Inicializa o TermIA."
         self.parser = TermIAParser()
         self.history = []
         self.running = True
@@ -68,7 +65,7 @@ class TermIA:
         self.debug_mode = debug_mode
     
     def print_banner(self):
-        """Imprime a logo bonita do shell."""
+        "Imprime a logo bonita do shell."
         banner = f"""
             {Fore.CYAN}{Style.BRIGHT}╔═══════════════════════════════════════════════════════╗
             ║                                                       ║
@@ -91,7 +88,7 @@ class TermIA:
         print(banner)
     
     def get_prompt(self):
-        """Retorna o prompt do terminal."""
+        "Retorna o prompt do terminal."
         # Mostra apenas o nome do diretório atual
         dir_name = os.path.basename(self.current_dir)
         if not dir_name:
@@ -172,15 +169,13 @@ class TermIA:
         # Comandos de SO (ainda não implementados)
         elif class_name in ['LSCommand', 'CDCommand', 'MkdirCommand', 'PwdCommand', 'CatCommand']:
             print(f"{Fore.CYAN}[Parser OK] Comando reconhecido: {ast}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}⚠  Executor de comandos SO ainda não implementado.{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW} Este comando será executado na próxima versão (Semana 4).{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}Executor de comandos SO ainda não implementado.{Style.RESET_ALL}")
             return
         
         # Comandos de IA (ainda não implementados)
         elif class_name in ['IAAskCommand', 'IASummarizeCommand', 'IACodeExplainCommand', 'IATranslateCommand']:
             print(f"{Fore.CYAN}[Parser OK] Comando IA reconhecido: {ast}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}⚠  Integração com IA ainda não implementada.{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW} Este comando será executado na próxima versão (Semana 5).{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}Integração com IA ainda não implementada.{Style.RESET_ALL}")
             return
         
         # Comando desconhecido
@@ -188,7 +183,7 @@ class TermIA:
             print(f"{Fore.RED}Erro: tipo de comando desconhecido: {class_name}{Style.RESET_ALL}")
     
     def show_history_ast(self, ast: HistoryCommand):
-        """Mostra o histórico usando o nó AST."""
+        "Mostra o histórico usando o nó AST."
         n = ast.count
         
         print(f"\n{Fore.CYAN}Histórico (últimos {n} comandos):{Style.RESET_ALL}")
@@ -197,7 +192,7 @@ class TermIA:
         print()
     
     def show_help_ast(self, ast: HelpCommand):
-        """Mostra ajuda usando o nó AST."""
+        "Mostra ajuda usando o nó AST."
         if ast.command is None:
             # Ajuda geral
             help_text = f"""
@@ -249,7 +244,7 @@ class TermIA:
                 print(f"{Fore.YELLOW}Use 'help' para ver todos os comandos{Style.RESET_ALL}")
     
     def run(self):
-        """Loop principal do terminal."""
+        "Loop principal do terminal."
         self.print_banner()
         
         while self.running:
@@ -274,11 +269,7 @@ class TermIA:
 
 
 def main():
-    """Função principal."""
-    # Verifica versão do Python
-    if sys.version_info < (3, 8):
-        print("Erro: TermIA requer Python 3.8 ou superior")
-        sys.exit(1)
+    "Função principal."
     
     # Verifica argumentos de linha de comando
     debug_mode = '--debug' in sys.argv or '-d' in sys.argv

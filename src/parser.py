@@ -23,14 +23,14 @@ class TermIAParser:
     """
     
     def __init__(self):
-        """Inicializa o parser."""
+        "Inicializa o parser"
         self.lexer = TermIALexer()
         self.tokens = self.lexer.tokens
         self.parser = None
         self.build()
     
     def build(self, **kwargs):
-        """Constrói o parser."""
+        "Constrói o parser"
         self.parser = yacc.yacc(module=self, **kwargs)
     
     # ==================== Regra Inicial ====================
@@ -54,58 +54,58 @@ class TermIAParser:
     # --- Comando LS ---
     
     def p_ls_command_full(self, p):
-        """ls_command : LS OPTION_SHORT path"""
+        "ls_command : LS OPTION_SHORT path"
         p[0] = LSCommand(options=p[2], path=p[3])
     
     def p_ls_command_with_path(self, p):
-        """ls_command : LS path"""
+        "ls_command : LS path"
         p[0] = LSCommand(path=p[2])
     
     def p_ls_command_with_option(self, p):
-        """ls_command : LS OPTION_SHORT"""
+        "ls_command : LS OPTION_SHORT"
         p[0] = LSCommand(options=p[2])
     
     def p_ls_command_simple(self, p):
-        """ls_command : LS"""
+        "ls_command : LS"
         p[0] = LSCommand()
     
     # --- Comando CD ---
     
     def p_cd_command_with_path(self, p):
-        """cd_command : CD path"""
+        "cd_command : CD path"
         p[0] = CDCommand(path=p[2])
     
     def p_cd_command_simple(self, p):
-        """cd_command : CD"""
+        "cd_command : CD"
         p[0] = CDCommand()
     
     # --- Comando MKDIR ---
     
     def p_mkdir_command_with_p(self, p):
-        """mkdir_command : MKDIR OPTION_SHORT path"""
+        "mkdir_command : MKDIR OPTION_SHORT path"
         create_parents = 'p' in p[2]
         p[0] = MkdirCommand(path=p[3], create_parents=create_parents)
     
     def p_mkdir_command_simple(self, p):
-        """mkdir_command : MKDIR path"""
+        "mkdir_command : MKDIR path"
         p[0] = MkdirCommand(path=p[2])
     
     # --- Comando PWD ---
     
     def p_pwd_command(self, p):
-        """pwd_command : PWD"""
+        "pwd_command : PWD"
         p[0] = PwdCommand()
     
     # --- Comando CAT ---
     
     def p_cat_command(self, p):
-        """cat_command : CAT path"""
+        "cat_command : CAT path"
         p[0] = CatCommand(filepath=p[2])
     
     # ==================== Comandos de IA ====================
     
     def p_ia_command(self, p):
-        """ia_command : IA ia_subcommand"""
+        "ia_command : IA ia_subcommand"
         p[0] = p[2]
     
     def p_ia_subcommand(self, p):
@@ -118,13 +118,13 @@ class TermIAParser:
     # --- IA Ask ---
     
     def p_ia_ask(self, p):
-        """ia_ask : ASK STRING"""
+        "ia_ask : ASK STRING"
         p[0] = IAAskCommand(question=p[2])
     
     # --- IA Summarize ---
     
     def p_ia_summarize_with_length(self, p):
-        """ia_summarize : SUMMARIZE STRING LONG_OPTION IDENTIFIER"""
+        "ia_summarize : SUMMARIZE STRING LONG_OPTION IDENTIFIER"
         # Verifica se a opção é --length
         if p[3] == 'length':
             length = p[4]
@@ -133,19 +133,19 @@ class TermIAParser:
         p[0] = IASummarizeCommand(text=p[2], length=length)
     
     def p_ia_summarize_simple(self, p):
-        """ia_summarize : SUMMARIZE STRING"""
+        "ia_summarize : SUMMARIZE STRING"
         p[0] = IASummarizeCommand(text=p[2])
     
     # --- IA Code Explain ---
     
     def p_ia_codeexplain(self, p):
-        """ia_codeexplain : CODEEXPLAIN path"""
+        "ia_codeexplain : CODEEXPLAIN path"
         p[0] = IACodeExplainCommand(filepath=p[2])
     
     # --- IA Translate ---
     
     def p_ia_translate(self, p):
-        """ia_translate : TRANSLATE STRING LONG_OPTION IDENTIFIER"""
+        "ia_translate : TRANSLATE STRING LONG_OPTION IDENTIFIER"
         # Verifica se a opção é --to
         if p[3] == 'to':
             target_lang = p[4]
@@ -165,33 +165,33 @@ class TermIAParser:
     # --- History ---
     
     def p_history_command_with_count(self, p):
-        """history_command : HISTORY NUMBER"""
+        "history_command : HISTORY NUMBER"
         p[0] = HistoryCommand(count=p[2])
     
     def p_history_command_simple(self, p):
-        """history_command : HISTORY"""
+        "history_command : HISTORY"
         p[0] = HistoryCommand()
     
     # --- Clear ---
     
     def p_clear_command(self, p):
-        """clear_command : CLEAR"""
+        "clear_command : CLEAR"
         p[0] = ClearCommand()
     
     # --- Help ---
     
     def p_help_command_with_topic(self, p):
-        """help_command : HELP command_name"""
+        "help_command : HELP command_name"
         p[0] = HelpCommand(command=p[2])
     
     def p_help_command_simple(self, p):
-        """help_command : HELP"""
+        "help_command : HELP"
         p[0] = HelpCommand()
     
     # --- Exit ---
     
     def p_exit_command(self, p):
-        """exit_command : EXIT"""
+        "exit_command : EXIT"
         p[0] = ExitCommand()
     
     # ==================== Regras Auxiliares ====================
@@ -221,7 +221,7 @@ class TermIAParser:
     # ==================== Tratamento de Erros ====================
     
     def p_error(self, p):
-        """Tratamento de erro sintático."""
+        "Tratamento de erro sintático."
         if p:
             # Mensagens específicas para erros comuns
             if p.type == 'MKDIR':
@@ -300,7 +300,7 @@ class TermIAParser:
 
 
 def main():
-    """Função principal para testes do parser."""
+    "Função principal para testes do parser."
     parser = TermIAParser()
     
     # Casos de teste

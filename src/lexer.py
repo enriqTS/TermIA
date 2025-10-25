@@ -83,14 +83,12 @@ class TermIALexer:
     t_SLASH = r'/'
 
     def __init__(self):
-        """Inicializa o lexer."""
+        "Inicializa o lexer"
         self.lexer: Optional[lex.Lexer] = None
         self.build()
 
     def build(self, **kwargs):
-        """
-        Constrói o lexer.
-        """
+        "Constrói o lexer"
         self.lexer = lex.lex(module=self, **kwargs)
 
     def t_LONG_OPTION(self, t):
@@ -160,9 +158,7 @@ class TermIALexer:
         pass  # Ignora comentários
 
     def t_error(self, t):
-        """
-        Tratamento de erro para caracteres inválidos.
-        """
+        "Tratamento de erro para caracteres inválidos."
         print(f"Caractere ilegal '{t.value[0]}' na linha {t.lineno}")
         t.lexer.skip(1)
 
@@ -214,9 +210,7 @@ class TermIALexer:
 
 
 def main():
-    """
-    Função principal para testes do lexer.
-    """
+    "Função principal para testes do lexer"
     lexer = TermIALexer()
     
     # Testes básicos
