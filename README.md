@@ -13,7 +13,6 @@
 - [Uso](#-uso)
 - [Comandos Disponíveis](#-comandos-disponíveis)
 - [Arquitetura](#-arquitetura)
-- [Desenvolvimento](#-desenvolvimento)
 - [Testes](#-testes)
 - [Licença](#-licença)
 
