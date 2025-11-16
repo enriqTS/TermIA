@@ -16,6 +16,7 @@ if src_dir not in sys.path:
 # Imports do projeto
 from parser import TermIAParser
 from executor import CommandExecutor, SecurityException
+from ai_executor import AIExecutor, AIException
 import ast_nodes
 
 # Importa as classes AST explicitamente
@@ -61,6 +62,7 @@ class TermIA:
         "Inicializa o TermIA."
         self.parser = TermIAParser()
         self.executor = CommandExecutor()
+        self.ai_executor = AIExecutor()
         self.history = []
         self.running = True
         self.current_dir = os.getcwd()
@@ -85,7 +87,7 @@ class TermIA:
             ╚═══════════════════════════════════════════════════════╝{Style.RESET_ALL}
 
             {Fore.YELLOW}Digite 'help' para ajuda ou 'exit' para sair{Style.RESET_ALL}
-            {Fore.GREEN}Status: Lexer ✓ | Parser ✓ | OS Executor ✓ | IA: em desenvolvimento{Style.RESET_ALL}
+            {Fore.GREEN}Status: Lexer ✓ | Parser ✓ | OS Executor ✓ | IA Executor ✓{Style.RESET_ALL}
             """
         print(banner)
     
@@ -189,10 +191,21 @@ class TermIA:
             self.execute_cat(ast)
             return
         
-        # Comandos de IA (ainda não implementados)
-        elif class_name in ['IAAskCommand', 'IASummarizeCommand', 'IACodeExplainCommand', 'IATranslateCommand']:
-            print(f"{Fore.CYAN}[Parser OK] Comando IA reconhecido: {ast}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}Integração com IA ainda não implementada.{Style.RESET_ALL}")
+        # Comandos de IA
+        elif class_name == 'IAAskCommand':
+            self.execute_ia_ask(ast)
+            return
+
+        elif class_name == 'IASummarizeCommand':
+            self.execute_ia_summarize(ast)
+            return
+
+        elif class_name == 'IACodeExplainCommand':
+            self.execute_ia_codeexplain(ast)
+            return
+
+        elif class_name == 'IATranslateCommand':
+            self.execute_ia_translate(ast)
             return
         
         # Comando desconhecido
@@ -331,6 +344,57 @@ class TermIA:
             print(f"{Fore.RED}{e}{Style.RESET_ALL}")
         except Exception as e:
             print(f"{Fore.RED}Erro ao executar cat: {e}{Style.RESET_ALL}")
+
+    # ==================== Executores de Comandos de IA ====================
+
+    def execute_ia_ask(self, ast: IAAskCommand):
+        """Executa o comando ia ask."""
+        try:
+            print(f"{Fore.YELLOW}[IA] Processando pergunta...{Style.RESET_ALL}")
+            result = self.ai_executor.execute_ia_ask(ast.question)
+            print(f"{Fore.CYAN}{result}{Style.RESET_ALL}")
+        except AIException as e:
+            print(f"{Fore.RED}Erro de IA: {e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}Erro ao executar ia ask: {e}{Style.RESET_ALL}")
+
+    def execute_ia_summarize(self, ast: IASummarizeCommand):
+        """Executa o comando ia summarize."""
+        try:
+            print(f"{Fore.YELLOW}[IA] Resumindo texto (tamanho: {ast.length})...{Style.RESET_ALL}")
+            result = self.ai_executor.execute_ia_summarize(ast.text, ast.length)
+            print(f"{Fore.CYAN}Resumo:{Style.RESET_ALL}")
+            print(f"{result}")
+        except AIException as e:
+            print(f"{Fore.RED}Erro de IA: {e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}Erro ao executar ia summarize: {e}{Style.RESET_ALL}")
+
+    def execute_ia_codeexplain(self, ast: IACodeExplainCommand):
+        """Executa o comando ia codeexplain."""
+        try:
+            print(f"{Fore.YELLOW}[IA] Analisando codigo em '{ast.filepath}'...{Style.RESET_ALL}")
+            # Resolve path relative to executor's current dir
+            filepath = os.path.join(self.executor.current_dir, ast.filepath)
+            result = self.ai_executor.execute_ia_codeexplain(filepath)
+            print(f"{Fore.CYAN}Explicacao do codigo:{Style.RESET_ALL}")
+            print(f"{result}")
+        except AIException as e:
+            print(f"{Fore.RED}Erro de IA: {e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}Erro ao executar ia codeexplain: {e}{Style.RESET_ALL}")
+
+    def execute_ia_translate(self, ast: IATranslateCommand):
+        """Executa o comando ia translate."""
+        try:
+            print(f"{Fore.YELLOW}[IA] Traduzindo para {ast.target_language}...{Style.RESET_ALL}")
+            result = self.ai_executor.execute_ia_translate(ast.text, ast.target_language)
+            print(f"{Fore.CYAN}Traducao:{Style.RESET_ALL}")
+            print(f"{result}")
+        except AIException as e:
+            print(f"{Fore.RED}Erro de IA: {e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}Erro ao executar ia translate: {e}{Style.RESET_ALL}")
 
     def run(self):
         "Loop principal do terminal."
