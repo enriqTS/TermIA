@@ -31,7 +31,8 @@ class TermIAParser:
     
     def build(self, **kwargs):
         "Constrói o parser"
-        self.parser = yacc.yacc(module=self, **kwargs)
+        # Suppress PLY output by setting debug=0 and write_tables=1
+        self.parser = yacc.yacc(module=self, debug=False, write_tables=True, **kwargs)
     
     # ==================== Regra Inicial ====================
     

@@ -17,6 +17,7 @@ if src_dir not in sys.path:
 from parser import TermIAParser
 from executor import CommandExecutor, SecurityException
 from ai_executor import AIExecutor, AIException
+from enhanced_input import EnhancedInputHandler
 import ast_nodes
 
 # Importa as classes AST explicitamente
@@ -58,12 +59,25 @@ except ImportError:
 class TermIA:
     "Classe principal do TermIA."
     
-    def __init__(self, debug_mode=False):
+    def __init__(self, debug_mode=False, enhanced_mode=True):
         "Inicializa o TermIA."
         self.parser = TermIAParser()
         self.executor = CommandExecutor()
         self.ai_executor = AIExecutor()
-        self.history = []
+        self.enhanced_mode = enhanced_mode
+
+        # Initialize enhanced input if available
+        if enhanced_mode:
+            try:
+                self.input_handler = EnhancedInputHandler('.termia_history')
+                self.history = []  # History managed by input handler
+            except Exception as e:
+                print(f"{Fore.YELLOW}Warning: Enhanced mode failed, using basic input: {e}{Style.RESET_ALL}")
+                self.enhanced_mode = False
+                self.history = []
+        else:
+            self.history = []
+
         self.running = True
         self.current_dir = os.getcwd()
         self.debug_mode = debug_mode
@@ -87,7 +101,6 @@ class TermIA:
             ╚═══════════════════════════════════════════════════════╝{Style.RESET_ALL}
 
             {Fore.YELLOW}Digite 'help' para ajuda ou 'exit' para sair{Style.RESET_ALL}
-            {Fore.GREEN}Status: Lexer ✓ | Parser ✓ | OS Executor ✓ | IA Executor ✓{Style.RESET_ALL}
             """
         print(banner)
     
@@ -97,7 +110,18 @@ class TermIA:
         dir_name = os.path.basename(self.current_dir)
         if not dir_name:
             dir_name = self.current_dir
-        return f"{Fore.GREEN}{dir_name}{Fore.CYAN} TermIA>{Style.RESET_ALL} "
+
+        # Use different prompt formatting for enhanced vs basic mode
+        if self.enhanced_mode:
+            # prompt_toolkit uses FormattedText with tuples
+            from prompt_toolkit.formatted_text import FormattedText
+            return FormattedText([
+                ('#00ff00', dir_name),      # Green for directory
+                ('#00ffff', ' TermIA> '),   # Cyan for prompt
+            ])
+        else:
+            # Basic mode uses colorama
+            return f"{Fore.GREEN}{dir_name}{Fore.CYAN} TermIA>{Style.RESET_ALL} "
     
     def process_command(self, command: str):
         """
@@ -215,9 +239,20 @@ class TermIA:
     def show_history_ast(self, ast: HistoryCommand):
         "Mostra o histórico usando o nó AST."
         n = ast.count
-        
+
+        # Get history from file if enhanced mode
+        if self.enhanced_mode:
+            try:
+                with open('.termia_history', 'r', encoding='utf-8') as f:
+                    all_history = [line.strip() for line in f.readlines() if line.strip()]
+                history_to_show = all_history[-n:]
+            except Exception:
+                history_to_show = self.history[-n:]
+        else:
+            history_to_show = self.history[-n:]
+
         print(f"\n{Fore.CYAN}Histórico (últimos {n} comandos):{Style.RESET_ALL}")
-        for i, cmd in enumerate(self.history[-n:], 1):
+        for i, cmd in enumerate(history_to_show, 1):
             print(f"{Fore.YELLOW}{i:3d}.{Style.RESET_ALL} {cmd}")
         print()
     
@@ -399,15 +434,18 @@ class TermIA:
     def run(self):
         "Loop principal do terminal."
         self.print_banner()
-        
+
         while self.running:
             try:
-                # Lê comando do usuário
-                command = input(self.get_prompt())
-                
+                # Lê comando do usuário (com ou sem enhanced mode)
+                if self.enhanced_mode:
+                    command = self.input_handler.get_input(self.get_prompt())
+                else:
+                    command = input(self.get_prompt())
+
                 # Processa comando
                 self.process_command(command)
-                
+
             except KeyboardInterrupt:
                 # Ctrl+C
                 print(f"\n{Fore.YELLOW}Use 'exit' para sair{Style.RESET_ALL}")

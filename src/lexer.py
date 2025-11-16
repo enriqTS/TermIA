@@ -50,7 +50,6 @@ class TermIALexer:
         'DOT',               # .
         'DOTDOT',            # ..
         'TILDE',             # ~
-        'SLASH',             # /
     )
 
     # Palavras reservadas (keywords)
@@ -78,9 +77,6 @@ class TermIALexer:
 
     # Caracteres ignorados (espaços e tabs)
     t_ignore = ' \t'
-
-    # Símbolos simples
-    t_SLASH = r'/'
 
     def __init__(self):
         "Inicializa o lexer"
