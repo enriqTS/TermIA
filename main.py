@@ -15,6 +15,7 @@ if src_dir not in sys.path:
 
 # Imports do projeto
 from parser import TermIAParser
+from executor import CommandExecutor, SecurityException
 import ast_nodes
 
 # Importa as classes AST explicitamente
@@ -59,6 +60,7 @@ class TermIA:
     def __init__(self, debug_mode=False):
         "Inicializa o TermIA."
         self.parser = TermIAParser()
+        self.executor = CommandExecutor()
         self.history = []
         self.running = True
         self.current_dir = os.getcwd()
@@ -83,7 +85,7 @@ class TermIA:
             ╚═══════════════════════════════════════════════════════╝{Style.RESET_ALL}
 
             {Fore.YELLOW}Digite 'help' para ajuda ou 'exit' para sair{Style.RESET_ALL}
-            {Fore.GREEN}Status: Lexer ✓ | Parser ✓ | Executor: em desenvolvimento{Style.RESET_ALL}
+            {Fore.GREEN}Status: Lexer ✓ | Parser ✓ | OS Executor ✓ | IA: em desenvolvimento{Style.RESET_ALL}
             """
         print(banner)
     
@@ -166,10 +168,25 @@ class TermIA:
             self.show_help_ast(ast)
             return
         
-        # Comandos de SO (ainda não implementados)
-        elif class_name in ['LSCommand', 'CDCommand', 'MkdirCommand', 'PwdCommand', 'CatCommand']:
-            print(f"{Fore.CYAN}[Parser OK] Comando reconhecido: {ast}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}Executor de comandos SO ainda não implementado.{Style.RESET_ALL}")
+        # Comandos de SO
+        elif class_name == 'PwdCommand':
+            self.execute_pwd()
+            return
+
+        elif class_name == 'LSCommand':
+            self.execute_ls(ast)
+            return
+
+        elif class_name == 'CDCommand':
+            self.execute_cd(ast)
+            return
+
+        elif class_name == 'MkdirCommand':
+            self.execute_mkdir(ast)
+            return
+
+        elif class_name == 'CatCommand':
+            self.execute_cat(ast)
             return
         
         # Comandos de IA (ainda não implementados)
@@ -242,7 +259,79 @@ class TermIA:
             else:
                 print(f"{Fore.RED}Comando '{cmd}' não encontrado{Style.RESET_ALL}")
                 print(f"{Fore.YELLOW}Use 'help' para ver todos os comandos{Style.RESET_ALL}")
-    
+
+    # ==================== Executores de Comandos do SO ====================
+
+    def execute_pwd(self):
+        """Executa o comando pwd."""
+        try:
+            result = self.executor.execute_pwd()
+            print(f"{Fore.CYAN}{result}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}Erro ao executar pwd: {e}{Style.RESET_ALL}")
+
+    def execute_ls(self, ast: LSCommand):
+        """Executa o comando ls."""
+        try:
+            result = self.executor.execute_ls(options=ast.options, path=ast.path)
+            print(result)
+        except SecurityException as e:
+            print(f"{Fore.RED}⚠ Erro de Segurança: {e}{Style.RESET_ALL}")
+        except FileNotFoundError as e:
+            print(f"{Fore.RED}{e}{Style.RESET_ALL}")
+        except PermissionError as e:
+            print(f"{Fore.RED}{e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}Erro ao executar ls: {e}{Style.RESET_ALL}")
+
+    def execute_cd(self, ast: CDCommand):
+        """Executa o comando cd."""
+        try:
+            result = self.executor.execute_cd(path=ast.path)
+            # Atualiza o current_dir do TermIA também
+            self.current_dir = self.executor.current_dir
+            print(f"{Fore.GREEN}{result}{Style.RESET_ALL}")
+        except SecurityException as e:
+            print(f"{Fore.RED}⚠ Erro de Segurança: {e}{Style.RESET_ALL}")
+        except FileNotFoundError as e:
+            print(f"{Fore.RED}{e}{Style.RESET_ALL}")
+        except NotADirectoryError as e:
+            print(f"{Fore.RED}{e}{Style.RESET_ALL}")
+        except PermissionError as e:
+            print(f"{Fore.RED}{e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}Erro ao executar cd: {e}{Style.RESET_ALL}")
+
+    def execute_mkdir(self, ast: MkdirCommand):
+        """Executa o comando mkdir."""
+        try:
+            result = self.executor.execute_mkdir(path=ast.path, create_parents=ast.create_parents)
+            print(f"{Fore.GREEN}{result}{Style.RESET_ALL}")
+        except SecurityException as e:
+            print(f"{Fore.RED}⚠ Erro de Segurança: {e}{Style.RESET_ALL}")
+        except FileExistsError as e:
+            print(f"{Fore.RED}{e}{Style.RESET_ALL}")
+        except PermissionError as e:
+            print(f"{Fore.RED}{e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}Erro ao executar mkdir: {e}{Style.RESET_ALL}")
+
+    def execute_cat(self, ast: CatCommand):
+        """Executa o comando cat."""
+        try:
+            result = self.executor.execute_cat(filepath=ast.filepath)
+            print(result)
+        except SecurityException as e:
+            print(f"{Fore.RED}⚠ Erro de Segurança: {e}{Style.RESET_ALL}")
+        except FileNotFoundError as e:
+            print(f"{Fore.RED}{e}{Style.RESET_ALL}")
+        except IsADirectoryError as e:
+            print(f"{Fore.RED}{e}{Style.RESET_ALL}")
+        except PermissionError as e:
+            print(f"{Fore.RED}{e}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}Erro ao executar cat: {e}{Style.RESET_ALL}")
+
     def run(self):
         "Loop principal do terminal."
         self.print_banner()
