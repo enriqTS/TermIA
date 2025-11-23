@@ -56,7 +56,5 @@ CLAUDE.md
 .claude/
 
 # Tests
-/tests
 tests/
-/test_dir
-test_dir\
+test_dir/
