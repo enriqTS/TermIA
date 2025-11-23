@@ -51,4 +51,4 @@ htmlcov/
 
 # Claude
 CLAUDE.md
-.claude/
+/.claude
