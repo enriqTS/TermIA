@@ -54,3 +54,7 @@ CLAUDE.md
 /.claude
 ./.claude
 .claude/
+
+# Tests
+/tests
+/test_dir
