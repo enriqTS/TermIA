@@ -57,4 +57,5 @@ CLAUDE.md
 
 # Tests
 /tests
+/tests/*
 /test_dir
