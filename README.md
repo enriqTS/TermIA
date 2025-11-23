@@ -64,7 +64,7 @@ venv\Scripts\activate  # No Windows
 
 3. **Instale as dependências:**
 ```bash
-pip install ply
+pip install ply pytest pyyaml
 ```
 
 4. **Execute o TermIA:**
