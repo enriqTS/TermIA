@@ -20,7 +20,7 @@ class AIExecutor:
     AI command executor that integrates with external AI API.
     """
 
-    def __init__(self, api_url: str = None, timeout: int = 30, max_retries: int = 3):
+    def __init__(self, api_url: str = None, timeout: int = 120, max_retries: int = 3):
         """
         Initialize the AI executor.
 
