@@ -70,6 +70,8 @@ pip install ply pytest colorama requests pyyaml prompt_toolkit pygments
 4. **Execute o TermIA:**
 ```bash
 python main.py
+# ou 
+python3 main.py
 ```
 
 ## Uso
