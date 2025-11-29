@@ -244,7 +244,16 @@ class TermIA:
         if self.enhanced_mode:
             try:
                 with open('.termia_history', 'r', encoding='utf-8') as f:
-                    all_history = [line.strip() for line in f.readlines() if line.strip()]
+                    lines = f.readlines()
+
+                # FileHistory format: lines with '+' prefix are commands, '#' are timestamps
+                all_history = []
+                for line in lines:
+                    line = line.strip()
+                    if line.startswith('+'):
+                        # Remove '+' prefix and add to history
+                        all_history.append(line[1:].strip())
+
                 history_to_show = all_history[-n:]
             except Exception:
                 history_to_show = self.history[-n:]
