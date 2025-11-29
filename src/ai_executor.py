@@ -33,6 +33,46 @@ class AIExecutor:
         self.timeout = timeout
         self.max_retries = max_retries
 
+    def _clean_markdown(self, text: str) -> str:
+        """
+        Remove common markdown formatting for cleaner terminal display.
+
+        Args:
+            text: Text with potential markdown formatting
+
+        Returns:
+            Cleaned plain text
+        """
+        import re
+
+        # Remove bold/italic: **text** or *text* -> text
+        text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)
+        text = re.sub(r'\*([^*]+)\*', r'\1', text)
+
+        # Remove inline code: `code` -> code
+        text = re.sub(r'`([^`]+)`', r'\1', text)
+
+        # Remove headers: ### Header -> Header
+        text = re.sub(r'^#{1,6}\s+(.+)$', r'\1', text, flags=re.MULTILINE)
+
+        # Remove horizontal rules: --- or ***
+        text = re.sub(r'^[\-*]{3,}$', '', text, flags=re.MULTILINE)
+
+        # Clean up markdown tables (simple approach: keep content, remove formatting)
+        # Remove table separators like |---|---|
+        text = re.sub(r'^\|[\s\-:|]+\|$', '', text, flags=re.MULTILINE)
+
+        # Convert table rows to simple lines
+        text = re.sub(r'^\|\s*(.+?)\s*\|$', r'\1', text, flags=re.MULTILINE)
+
+        # Replace multiple pipes with commas for readability
+        text = re.sub(r'\s*\|\s*', ' | ', text)
+
+        # Remove multiple blank lines
+        text = re.sub(r'\n\n\n+', '\n\n', text)
+
+        return text.strip()
+
     def _call_api(self, prompt: str, max_tokens: int = 500, temperature: float = 0.7) -> str:
         """
         Make API call to AI service.
@@ -116,8 +156,27 @@ class AIExecutor:
         if not question or question.strip() == "":
             raise AIException("Question cannot be empty")
 
-        prompt = question
-        return self._call_api(prompt, max_tokens=300)
+        # Detect shell substitution attempts
+        if "$(" in question or "${" in question or ("`" in question and question.count("`") >= 2):
+            raise AIException(
+                "Shell substitution não é suportado no TermIA.\n"
+                "  TermIA é um terminal educacional focado em compiladores.\n\n"
+                "  Para perguntar sobre arquivos:\n"
+                "  • Use: ia codeexplain arquivo.py (para código)\n"
+                "  • Ou faça perguntas diretas sobre conceitos"
+            )
+
+        # Add instruction for plain text output
+        prompt = f"""{question}
+
+IMPORTANTE: Responda em TEXTO PURO para exibicao em terminal.
+- NAO use tabelas markdown
+- NAO use formatacao markdown (**negrito**, *italico*, etc)
+- Use apenas texto simples e listas com "•" ou "-"
+- Seja claro e direto"""
+
+        response = self._call_api(prompt, max_tokens=300)
+        return self._clean_markdown(response)
 
     def execute_ia_summarize(self, text: str, length: str = "short") -> str:
         """
@@ -133,6 +192,19 @@ class AIExecutor:
         if not text or text.strip() == "":
             raise AIException("Text to summarize cannot be empty")
 
+        # Detect shell substitution attempts
+        if "$(cat" in text or "${cat" in text or "`cat" in text:
+            raise AIException(
+                "Shell substitution não é suportado no TermIA.\n"
+                "  TermIA é um terminal educacional focado em compiladores.\n\n"
+                "  Para resumir conteúdo de arquivo:\n"
+                "  1. Use 'cat' para ver o conteúdo\n"
+                "  2. Copie o texto\n"
+                "  3. Use: ia summarize \"texto copiado\" --length medium\n\n"
+                "  Ou considere usar ia ask para perguntas sobre arquivos:\n"
+                "  ia ask \"Resuma o conceito principal do README\""
+            )
+
         # Map length to token counts
         length_tokens = {
             "short": 100,
@@ -143,13 +215,29 @@ class AIExecutor:
 
         # Build prompt
         if length == "short":
-            prompt = f"Resuma o seguinte texto em no maximo 2-3 frases:\n\n{text}"
-        elif length == "medium":
-            prompt = f"Resuma o seguinte texto em um paragrafo:\n\n{text}"
-        else:  # long
-            prompt = f"Faca um resumo detalhado do seguinte texto:\n\n{text}"
+            prompt = f"""Resuma o seguinte texto em no maximo 2-3 frases:
 
-        return self._call_api(prompt, max_tokens=max_tokens)
+{text}
+
+IMPORTANTE: Responda em TEXTO PURO, sem formatacao markdown."""
+        elif length == "medium":
+            prompt = f"""Resuma o seguinte texto em um paragrafo:
+
+{text}
+
+IMPORTANTE: Responda em TEXTO PURO, sem formatacao markdown."""
+        else:  # long
+            prompt = f"""Faca um resumo detalhado do seguinte texto:
+
+{text}
+
+IMPORTANTE: Responda em TEXTO PURO para terminal.
+- NAO use formatacao markdown
+- Use apenas texto simples e listas com "•" ou "-"
+- Organize em paragrafos claros"""
+
+        response = self._call_api(prompt, max_tokens=max_tokens)
+        return self._clean_markdown(response)
 
     def execute_ia_codeexplain(self, filepath: str) -> str:
         """
@@ -161,9 +249,27 @@ class AIExecutor:
         Returns:
             Explanation of the code
         """
+        # Check for common syntax mistakes
+        suspicious_names = ['short', 'medium', 'long', 'pt', 'en', 'es', 'fr', 'de', 'it']
+        if filepath.lower() in suspicious_names:
+            raise AIException(
+                f"'{filepath}' doesn't look like a file path.\n"
+                f"  Uso correto: ia codeexplain <arquivo>\n"
+                f"  Exemplo: ia codeexplain main.py\n"
+                f"  NOTA: Use o caminho do arquivo, não uma string entre aspas!"
+            )
+
         # Read the file
         if not os.path.exists(filepath):
-            raise AIException(f"File not found: {filepath}")
+            # Provide helpful error message
+            raise AIException(
+                f"Arquivo não encontrado: {filepath}\n"
+                f"  Certifique-se de que:\n"
+                f"  • O arquivo existe no diretório atual\n"
+                f"  • O caminho está correto\n"
+                f"  • Você não está usando aspas em volta do caminho\n"
+                f"  Exemplo correto: ia codeexplain main.py"
+            )
 
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
@@ -180,9 +286,22 @@ class AIExecutor:
 
         # Build prompt
         file_extension = os.path.splitext(filepath)[1]
-        prompt = f"Explique o seguinte codigo (arquivo {filepath}):\n\n```{file_extension}\n{code}\n```\n\nForneça uma explicacao clara e concisa do que este codigo faz."
+        prompt = f"""Explique o seguinte codigo (arquivo {filepath}):
 
-        return self._call_api(prompt, max_tokens=500)
+```{file_extension}
+{code}
+```
+
+IMPORTANTE: Responda em TEXTO PURO para exibicao em terminal.
+- NAO use tabelas markdown
+- NAO use formatacao markdown (**negrito**, *italico*, etc)
+- Use apenas texto simples, paragrafos e listas com "•" ou "-"
+- Seja claro e conciso
+
+Forneça uma explicacao do que este codigo faz."""
+
+        response = self._call_api(prompt, max_tokens=500)
+        return self._clean_markdown(response)
 
     def execute_ia_translate(self, text: str, target_language: str) -> str:
         """
@@ -197,6 +316,16 @@ class AIExecutor:
         """
         if not text or text.strip() == "":
             raise AIException("Text to translate cannot be empty")
+
+        # Detect shell substitution attempts
+        if "$(" in text or "${" in text or ("`" in text and text.count("`") >= 2):
+            raise AIException(
+                "Shell substitution não é suportado no TermIA.\n"
+                "  TermIA é um terminal educacional focado em compiladores.\n\n"
+                "  Para traduzir texto:\n"
+                "  • Digite o texto diretamente entre aspas\n"
+                "  • Exemplo: ia translate \"Hello World\" --to pt"
+            )
 
         # Map language codes to full names
         language_names = {
@@ -217,7 +346,8 @@ class AIExecutor:
         # Build prompt
         prompt = f"Traduza o seguinte texto para {target_lang_name}:\n\n{text}\n\nResponda APENAS com a traducao, sem explicacoes adicionais."
 
-        return self._call_api(prompt, max_tokens=300)
+        response = self._call_api(prompt, max_tokens=300)
+        return self._clean_markdown(response)
 
 
 def main():

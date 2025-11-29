@@ -212,6 +212,10 @@ class TermIAParser:
                         | PWD
                         | CAT
                         | IA
+                        | ASK
+                        | SUMMARIZE
+                        | CODEEXPLAIN
+                        | TRANSLATE
                         | HISTORY
                         | CLEAR
                         | HELP

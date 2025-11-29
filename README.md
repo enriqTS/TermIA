@@ -51,7 +51,7 @@
 1. **Clone o repositório:**
 ```bash
 git clone https://github.com/enriqTS/TermIA.git
-cd termia
+cd TermIA
 ```
 
 2. **Crie um ambiente virtual:**
@@ -87,7 +87,7 @@ python main.py
 #### Comandos do Sistema
 ```bash
 TermIA> ls -la
-TermIA> cd /home/user/projects
+TermIA> cd ~
 TermIA> mkdir -p new_project/src
 TermIA> pwd
 TermIA> cat README.md
@@ -96,7 +96,7 @@ TermIA> cat README.md
 #### Comandos de IA
 ```bash
 TermIA> ia ask "O que é um compilador?"
-TermIA> ia summarize "$(cat artigo.txt)" --length medium
+TermIA> ia summarize "Texto" --length medium
 TermIA> ia codeexplain main.py
 TermIA> ia translate "Hello World" --to pt
 ```

@@ -123,31 +123,96 @@ class TermIA:
             # Basic mode uses colorama
             return f"{Fore.GREEN}{dir_name}{Fore.CYAN} TermIA>{Style.RESET_ALL} "
     
+    def _check_restricted_command(self, command: str) -> bool:
+        """
+        Verifica se o comando contém padrões restritos e exibe aviso.
+
+        Args:
+            command: String com o comando a ser verificado
+
+        Returns:
+            True se o comando está bloqueado, False caso contrário
+        """
+        # Lista de comandos perigosos conhecidos (além dos configurados)
+        dangerous_patterns = [
+            ('rm', 'remove/delete files'),
+            ('format', 'format disk'),
+            ('mkfs', 'create filesystem'),
+            ('dd', 'disk dump/write'),
+            ('fdisk', 'partition disk'),
+            ('parted', 'partition editor'),
+            ('mkswap', 'create swap'),
+            ('reboot', 'reboot system'),
+            ('shutdown', 'shutdown system'),
+            ('halt', 'halt system'),
+            ('poweroff', 'power off system'),
+            ('kill -9', 'force kill process'),
+        ]
+
+        command_lower = command.lower()
+
+        # Verifica padrões conhecidos
+        for pattern, description in dangerous_patterns:
+            if pattern in command_lower:
+                print(f"\n{Fore.RED}{'=' * 70}{Style.RESET_ALL}")
+                print(f"{Fore.RED}{Style.BRIGHT}⚠  COMANDO BLOQUEADO POR SEGURANÇA{Style.RESET_ALL}")
+                print(f"{Fore.RED}{'=' * 70}{Style.RESET_ALL}\n")
+                print(f"{Fore.YELLOW}Comando detectado:{Style.RESET_ALL} {Fore.RED}{pattern}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}Descrição:{Style.RESET_ALL} {description}")
+                print(f"\n{Fore.CYAN}ℹ  TermIA bloqueia comandos destrutivos para sua segurança.{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}   Este é um terminal educacional focado em compiladores.{Style.RESET_ALL}\n")
+                print(f"{Fore.GREEN}Comandos disponíveis:{Style.RESET_ALL}")
+                print(f"  • OS: {Fore.CYAN}ls, cd, mkdir, pwd, cat{Style.RESET_ALL}")
+                print(f"  • IA: {Fore.CYAN}ia ask, ia summarize, ia codeexplain, ia translate{Style.RESET_ALL}")
+                print(f"  • Controle: {Fore.CYAN}history, clear, help, exit{Style.RESET_ALL}")
+                print(f"\n{Fore.YELLOW}Use 'help' para mais informações{Style.RESET_ALL}\n")
+                print(f"{Fore.RED}{'=' * 70}{Style.RESET_ALL}\n")
+                return True
+
+        # Verifica comandos restritos da configuração
+        if hasattr(self, 'executor') and hasattr(self.executor, 'restricted_commands'):
+            for restricted in self.executor.restricted_commands:
+                if restricted.lower() in command_lower:
+                    print(f"\n{Fore.RED}{'=' * 70}{Style.RESET_ALL}")
+                    print(f"{Fore.RED}{Style.BRIGHT}⚠  COMANDO BLOQUEADO POR CONFIGURAÇÃO{Style.RESET_ALL}")
+                    print(f"{Fore.RED}{'=' * 70}{Style.RESET_ALL}\n")
+                    print(f"{Fore.YELLOW}Padrão bloqueado:{Style.RESET_ALL} {Fore.RED}{restricted}{Style.RESET_ALL}")
+                    print(f"\n{Fore.CYAN}ℹ  Este comando está na lista de restrições do config.yaml{Style.RESET_ALL}\n")
+                    print(f"{Fore.YELLOW}Use 'help' para ver comandos disponíveis{Style.RESET_ALL}\n")
+                    print(f"{Fore.RED}{'=' * 70}{Style.RESET_ALL}\n")
+                    return True
+
+        return False
+
     def process_command(self, command: str):
         """
         Processa um comando usando o parser.
-        
+
         Args:
             command: String com o comando a ser processado
         """
         # Remove espaços extras
         command = command.strip()
-        
+
         # Ignora linhas vazias
         if not command:
             return
-        
+
+        # Verifica comandos restritos ANTES de tentar fazer parsing
+        if self._check_restricted_command(command):
+            return
+
         # Adiciona ao histórico
         self.history.append(command)
-        
+
         # Faz parsing do comando
         try:
             ast = self.parser.parse(command, debug=self.debug_mode)
-            
+
             if ast is None:
                 # O parser ja imprime o erro
                 return
-            
+
             # Exibe AST em modo debug
             if self.debug_mode:
                 print(f"\n{Fore.BLUE}[DEBUG - AST]{Style.RESET_ALL}")
@@ -156,10 +221,10 @@ class TermIA:
                 import json
                 print(f"  Dict: {json.dumps(ast.to_dict(), indent=2)}")
                 print()
-            
+
             # Executa o comando baseado no tipo da AST
             self.execute_ast(ast)
-            
+
         except Exception as e:
             print(f"{Fore.RED}Erro ao processar comando: {e}{Style.RESET_ALL}")
             if self.debug_mode:
@@ -273,26 +338,42 @@ class TermIA:
 {Fore.CYAN}{Style.BRIGHT}Comandos Disponíveis:{Style.RESET_ALL}
 
 {Fore.YELLOW}Sistema Operacional:{Style.RESET_ALL}
-  ls [opções] [caminho]      - Lista arquivos e diretórios
-  cd [caminho]               - Muda de diretório
-  mkdir [-p] <dir>           - Cria diretório
-  pwd                        - Mostra diretório atual
-  cat <arquivo>              - Exibe conteúdo de arquivo
+  ls [opções] [caminho]          - Lista arquivos e diretórios
+  cd [caminho]                   - Muda de diretório
+  mkdir [-p] <dir>               - Cria diretório
+  pwd                            - Mostra diretório atual
+  cat <arquivo>                  - Exibe conteúdo de arquivo
 
 {Fore.YELLOW}Inteligência Artificial:{Style.RESET_ALL}
-  ia ask "<pergunta>"        - Faz pergunta à IA
-  ia summarize "<texto>"     - Resume texto
-  ia codeexplain <arquivo>   - Explica código
-  ia translate "<texto>"     - Traduz texto
+  ia ask "<pergunta>"            - Faz pergunta à IA (help ask)
+  ia summarize "<texto>"         - Resume texto (help summarize)
+  ia codeexplain <arquivo>       - Explica código (help codeexplain)
+  ia translate "<texto>" --to pt - Traduz texto (help translate)
 
 {Fore.YELLOW}Controle:{Style.RESET_ALL}
-  history [n]                - Mostra histórico
-  clear                      - Limpa tela
-  help [comando]             - Mostra ajuda
-  exit                       - Sai do terminal
+  history [n]                    - Mostra histórico
+  clear                          - Limpa tela
+  help [comando]                 - Mostra ajuda detalhada
+  exit                           - Sai do terminal
 
-{Fore.GREEN}Para mais informações: help <comando>{Style.RESET_ALL}
+{Fore.GREEN}Ajuda detalhada:{Style.RESET_ALL}
+  help ia            - Visão geral dos comandos IA
+  help ask           - Ajuda detalhada do ia ask
+  help summarize     - Ajuda detalhada do ia summarize
+  help codeexplain   - Ajuda detalhada do ia codeexplain
+  help translate     - Ajuda detalhada do ia translate
+
 {Fore.BLUE}Modo debug: execute com --debug{Style.RESET_ALL}
+
+{Fore.CYAN}Exemplos:{Style.RESET_ALL}
+  ia ask "O que é compilador?"
+  ia summarize "texto aqui" --length short
+  ia codeexplain main.py
+  ia translate "Hello" --to pt
+
+{Fore.YELLOW}Nota:{Style.RESET_ALL}
+  TermIA não suporta shell substitution $(cmd), pipes |, ou redirecionamento >
+  Este é um terminal educacional focado em análise léxica e sintática
 """
             print(help_text)
         else:
@@ -304,18 +385,132 @@ class TermIA:
                 'mkdir': 'mkdir [-p] <diretório>\n  Cria um novo diretório\n  -p: cria diretórios pais se necessário',
                 'pwd': 'pwd\n  Mostra o diretório de trabalho atual',
                 'cat': 'cat <arquivo>\n  Exibe o conteúdo de um arquivo',
-                'ia': 'ia <subcomando>\n  Comandos de IA: ask, summarize, codeexplain, translate\n  Exemplo: ia ask "Sua pergunta aqui"',
+                'ia': '''ia <subcomando>
+  Comandos de IA disponíveis:
+
+  ia ask "<pergunta>"
+    Faz uma pergunta à IA
+    Exemplo: ia ask "O que é Python?"
+
+  ia summarize "<texto>" [--length short|medium|long]
+    Resume um texto fornecido
+    Exemplo: ia summarize "texto longo aqui" --length short
+
+  ia codeexplain <arquivo>
+    Explica o código de um arquivo
+    Exemplo: ia codeexplain main.py
+    NOTA: Requer um caminho de arquivo, não uma string
+
+  ia translate "<texto>" --to <idioma>
+    Traduz texto para outro idioma
+    Exemplo: ia translate "Hello world" --to pt
+    Idiomas: pt, en, es, fr, de, it, ja, zh
+
+  IMPORTANTE:
+    TermIA não suporta shell substitution como $(cat file)
+    Para resumir conteúdo de arquivo, use ia codeexplain
+    ou copie e cole o texto diretamente
+
+  Para ajuda detalhada: help ask, help summarize, etc.''',
+                # IA Subcommands
+                'ask': '''ia ask "<pergunta>"
+  Faz uma pergunta à IA e recebe uma resposta
+
+  SINTAXE:
+    ia ask "<sua pergunta>"
+
+  EXEMPLOS:
+    ia ask "O que é Python?"
+    ia ask "Explique o que é um compilador"
+    ia ask "Qual a diferença entre léxico e sintático?"
+
+  NOTAS:
+    • A pergunta deve estar entre aspas
+    • Respostas em texto puro otimizado para terminal
+    • Não suporta shell substitution $(cmd)''',
+                'summarize': '''ia summarize "<texto>" [--length <tamanho>]
+  Resume um texto fornecido
+
+  SINTAXE:
+    ia summarize "<texto a resumir>"
+    ia summarize "<texto a resumir>" --length <tamanho>
+
+  OPÇÕES:
+    --length short   - Resumo curto (2-3 frases)
+    --length medium  - Resumo médio (1 parágrafo) [padrão]
+    --length long    - Resumo detalhado (múltiplos parágrafos)
+
+  EXEMPLOS:
+    ia summarize "Python é uma linguagem..." --length short
+    ia summarize "Este texto fala sobre compiladores..."
+
+  NOTAS:
+    • O texto deve estar entre aspas
+    • Não use $(cat arquivo) - não é suportado
+    • Para arquivos de código, use: ia codeexplain arquivo''',
+                'codeexplain': '''ia codeexplain <arquivo>
+  Explica o código de um arquivo
+
+  SINTAXE:
+    ia codeexplain <caminho_do_arquivo>
+
+  EXEMPLOS:
+    ia codeexplain main.py
+    ia codeexplain src/parser.py
+    ia codeexplain ../outro_arquivo.py
+
+  NOTAS:
+    • NÃO use aspas em volta do nome do arquivo
+    • O arquivo deve existir no sistema
+    • Suporta caminhos relativos e absolutos
+    • Código truncado em 2000 caracteres para evitar limites
+    • Saída otimizada para terminal (sem markdown)
+
+  ERROS COMUNS:
+    ✗ ia codeexplain "main.py"     (não use aspas)
+    ✗ ia codeexplain --length      (--length é para summarize)
+    ✓ ia codeexplain main.py       (correto!)''',
+                'translate': '''ia translate "<texto>" --to <idioma>
+  Traduz texto para outro idioma
+
+  SINTAXE:
+    ia translate "<texto a traduzir>" --to <código_idioma>
+
+  IDIOMAS SUPORTADOS:
+    pt - Português    en - Inglês      es - Espanhol
+    fr - Francês      de - Alemão      it - Italiano
+    ja - Japonês      zh - Chinês      ru - Russo
+    ar - Árabe
+
+  EXEMPLOS:
+    ia translate "Hello world" --to pt
+    ia translate "Bom dia" --to en
+    ia translate "Good morning" --to es
+
+  NOTAS:
+    • O texto deve estar entre aspas
+    • O código do idioma usa 2 letras
+    • Apenas a tradução é retornada (sem explicações)
+    • Não suporta shell substitution $(cmd)''',
                 'history': 'history [n]\n  Mostra os últimos n comandos (padrão: 10)',
                 'clear': 'clear\n  Limpa a tela do terminal',
-                'help': 'help [comando]\n  Mostra ajuda geral ou sobre um comando específico',
+                'help': 'help [comando]\n  Mostra ajuda geral ou sobre um comando específico\n  Também funciona com subcomandos: help ask, help translate',
                 'exit': 'exit\n  Encerra o TermIA'
             }
             
-            if cmd in helps:
-                print(f"\n{Fore.CYAN}{helps[cmd]}{Style.RESET_ALL}\n")
+            # Normalize command name (lowercase)
+            cmd_lower = cmd.lower() if isinstance(cmd, str) else str(cmd).lower()
+
+            if cmd_lower in helps:
+                print(f"\n{Fore.CYAN}{helps[cmd_lower]}{Style.RESET_ALL}\n")
             else:
-                print(f"{Fore.RED}Comando '{cmd}' não encontrado{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}Use 'help' para ver todos os comandos{Style.RESET_ALL}")
+                print(f"\n{Fore.RED}Comando '{cmd}' não encontrado{Style.RESET_ALL}")
+                print(f"\n{Fore.YELLOW}Comandos disponíveis:{Style.RESET_ALL}")
+                print(f"  OS: ls, cd, mkdir, pwd, cat")
+                print(f"  IA: ask, summarize, codeexplain, translate")
+                print(f"  Controle: history, clear, help, exit")
+                print(f"\n{Fore.CYAN}Dica:{Style.RESET_ALL} Use 'help' para ver a lista completa")
+                print(f"{Fore.CYAN}      Para comandos IA: help ask, help translate, etc.{Style.RESET_ALL}\n")
 
     # ==================== Executores de Comandos do SO ====================
 
