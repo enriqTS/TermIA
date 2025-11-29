@@ -64,7 +64,7 @@ venv\Scripts\activate  # No Windows
 
 3. **Instale as dependências:**
 ```bash
-pip install ply pytest pyyaml
+pip install ply pytest colorama requests pyyaml prompt_toolkit pygments
 ```
 
 4. **Execute o TermIA:**
