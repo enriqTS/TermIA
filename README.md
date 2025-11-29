@@ -171,11 +171,12 @@ TermIA> exit
 
 ```
 tests/
-├── test_lexer.py          # Testes do analisador léxico
-├── test_parser.py         # Testes do analisador sintático
-├── test_executor.py       # Testes do executor
-├── test_ia_commands.py    # Testes dos comandos IA
-└── fixtures/              # Arquivos de teste
+├── test_ai_api.py                 # Teste padrão da API fornecido pelo professor
+├── test_lexer.py                  # Testes do analisador léxico
+├── test_parser.py                 # Testes do analisador sintático
+├── test_executor.py               # Testes do executor do SO
+├── test_ia_commands.py            # Testes dos comandos IA
+└── test_enhanced_features.py      # Testes de features adicionais pedidas
 ```
 
 ### Executar Testes Específicos
