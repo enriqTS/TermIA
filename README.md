@@ -37,7 +37,6 @@
 - **Autocomplete** inteligente
 - **Syntax highlighting**
 - **Mensagens de erro claras**
-- **Modo seguro** para comandos perigosos
 
 ## Instalação
 
@@ -81,6 +80,8 @@ python3 main.py
 
 ```bash
 python main.py
+# ou 
+python3 main.py
 ```
 
 ### Exemplos de Comandos
